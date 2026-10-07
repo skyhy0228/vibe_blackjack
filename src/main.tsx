@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Coins, Hand, RotateCcw, Sparkles } from "lucide-react";
+import { Coins, Hand, RotateCcw, Sparkles, StepBack, Trash2 } from "lucide-react";
 import "./styles.css";
 
 type Suit = "spades" | "hearts" | "diamonds" | "clubs";
@@ -19,6 +19,9 @@ type Phase = "betting" | "playing" | "dealer" | "roundOver" | "broke";
 const suits: Suit[] = ["spades", "hearts", "diamonds", "clubs"];
 const ranks: Rank[] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 const chipOptions = [10, 25, 50, 100];
+const startingBankrollOptions = [500, 1000, 2500, 5000];
+const defaultStartingBankroll = 1000;
+const assetPath = (path: string) => `${import.meta.env.BASE_URL}${path}`;
 
 const suitGlyph: Record<Suit, string> = {
   spades: "♠",
@@ -96,17 +99,28 @@ function App() {
   const [playerHand, setPlayerHand] = React.useState<Card[]>([]);
   const [dealerHand, setDealerHand] = React.useState<Card[]>([]);
   const [phase, setPhase] = React.useState<Phase>("betting");
-  const [bankroll, setBankroll] = React.useState(1000);
-  const [bet, setBet] = React.useState(50);
-  const [message, setMessage] = React.useState("칩을 고르고 딜을 시작하세요.");
+  const [startingBankroll, setStartingBankroll] = React.useState(defaultStartingBankroll);
+  const [bankroll, setBankroll] = React.useState(defaultStartingBankroll);
+  const [betStack, setBetStack] = React.useState<number[]>([]);
+  const [message, setMessage] = React.useState("시작 금액을 정하고 칩을 올려 딜을 시작하세요.");
   const [isBusy, setIsBusy] = React.useState(false);
   const [round, setRound] = React.useState(1);
   const [streak, setStreak] = React.useState(0);
 
+  const bet = betStack.reduce((total, amount) => total + amount, 0);
+  const chipCounts = chipOptions.reduce<Record<number, number>>((counts, amount) => {
+    counts[amount] = betStack.filter((chip) => chip === amount).length;
+    return counts;
+  }, {});
   const playerScore = handValue(playerHand);
   const dealerScore = handValue(dealerHand);
-  const canDeal = phase === "betting" && !isBusy && bankroll >= bet;
+  const canConfigureBankroll = phase === "betting" && round === 1 && playerHand.length === 0 && dealerHand.length === 0 && !isBusy;
+  const canDeal = phase === "betting" && !isBusy && bet > 0 && bankroll >= bet;
   const canAct = phase === "playing" && !isBusy;
+  const appStyle = {
+    "--table-image": `url("${assetPath("images/casino-table.svg")}")`,
+    "--card-back-image": `url("${assetPath("images/card-back.svg")}")`,
+  } as React.CSSProperties;
 
   const ensureDeck = React.useCallback((currentDeck: Card[]) => {
     if (currentDeck.length > 14) return currentDeck;
@@ -114,9 +128,35 @@ function App() {
     return shuffle(buildDeck());
   }, []);
 
-  const updateBet = (amount: number) => {
+  const updateStartingBankroll = (amount: number) => {
+    if (!canConfigureBankroll) return;
+    const cleanAmount = Math.max(100, Math.min(50000, Math.round(amount || defaultStartingBankroll)));
+    setStartingBankroll(cleanAmount);
+    setBankroll(cleanAmount);
+    setBetStack([]);
+    setMessage(`시작 금액을 $${cleanAmount}로 설정했습니다. 원하는 칩을 올려보세요.`);
+  };
+
+  const addChip = (amount: number) => {
     if (phase !== "betting") return;
-    setBet(Math.min(amount, bankroll || amount));
+    if (bet + amount > bankroll) {
+      setMessage("보유 금액보다 많이 베팅할 수 없습니다.");
+      return;
+    }
+    setBetStack((stack) => [...stack, amount]);
+    setMessage(`$${amount} 칩을 올렸습니다.`);
+  };
+
+  const undoChip = () => {
+    if (phase !== "betting") return;
+    setBetStack((stack) => stack.slice(0, -1));
+    setMessage("마지막 칩을 되돌렸습니다.");
+  };
+
+  const clearBet = () => {
+    if (phase !== "betting") return;
+    setBetStack([]);
+    setMessage("베팅을 비웠습니다. 원하는 칩을 다시 올리세요.");
   };
 
   const settleRound = React.useCallback(
@@ -151,6 +191,10 @@ function App() {
 
   const deal = async () => {
     if (!canDeal) return;
+    if (bet <= 0) {
+      setMessage("먼저 칩을 하나 이상 올려주세요.");
+      return;
+    }
     setIsBusy(true);
     setMessage("카드를 나누는 중...");
 
@@ -240,12 +284,11 @@ function App() {
   };
 
   const nextRound = () => {
-    const nextBet = Math.min(bet, bankroll);
     setPlayerHand([]);
     setDealerHand([]);
-    setBet(nextBet || 10);
+    setBetStack([]);
     setPhase(bankroll > 0 ? "betting" : "broke");
-    setMessage(bankroll > 0 ? "다음 라운드입니다. 베팅을 조정하세요." : "칩이 없습니다. 새 게임을 시작하세요.");
+    setMessage(bankroll > 0 ? "다음 라운드입니다. 원하는 칩을 올려 베팅하세요." : "칩이 없습니다. 새 게임을 시작하세요.");
     setRound((value) => value + 1);
   };
 
@@ -254,15 +297,15 @@ function App() {
     setPlayerHand([]);
     setDealerHand([]);
     setPhase("betting");
-    setBankroll(1000);
-    setBet(50);
-    setMessage("새 테이블에 앉았습니다. 행운을 빕니다.");
+    setBankroll(startingBankroll);
+    setBetStack([]);
+    setMessage("새 테이블에 앉았습니다. 원하는 칩을 올려보세요.");
     setRound(1);
     setStreak(0);
   };
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" style={appStyle}>
       <div className="felt-glow" />
       <section className="table">
         <header className="top-bar">
@@ -282,6 +325,29 @@ function App() {
         <HandArea title="Dealer" score={dealerScore || "?"} hand={dealerHand} side="dealer" />
 
         <section className="center-lane" aria-live="polite">
+          <div className="bankroll-panel">
+            <label htmlFor="starting-bankroll">Starting cash</label>
+            <div className="bankroll-input-row">
+              <span>$</span>
+              <input
+                id="starting-bankroll"
+                type="number"
+                min="100"
+                max="50000"
+                step="100"
+                value={startingBankroll}
+                disabled={!canConfigureBankroll}
+                onChange={(event) => updateStartingBankroll(Number(event.target.value))}
+              />
+            </div>
+            <div className="quick-bankrolls">
+              {startingBankrollOptions.map((amount) => (
+                <button key={amount} onClick={() => updateStartingBankroll(amount)} disabled={!canConfigureBankroll}>
+                  ${amount}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="shoe">
             <div className="deck-stack" />
             <span>{deck.length} cards</span>
@@ -293,14 +359,27 @@ function App() {
           <div className="chip-tray" aria-label="Bet controls">
             {chipOptions.map((amount) => (
               <button
-                className={`chip chip-${amount} ${bet === amount ? "active" : ""}`}
+                className={`chip chip-${amount} ${chipCounts[amount] ? "active" : ""}`}
                 key={amount}
-                onClick={() => updateBet(amount)}
-                disabled={phase !== "betting" || bankroll < amount}
+                onClick={() => addChip(amount)}
+                disabled={phase !== "betting" || bet + amount > bankroll}
               >
                 ${amount}
+                {chipCounts[amount] > 0 ? <span className="chip-count">x{chipCounts[amount]}</span> : null}
               </button>
             ))}
+          </div>
+          <div className="bet-stack" aria-label="Current bet">
+            <span>Current bet</span>
+            <strong>${bet}</strong>
+            <div className="bet-stack-actions">
+              <button onClick={undoChip} disabled={phase !== "betting" || betStack.length === 0} title="Undo last chip">
+                <StepBack size={16} />
+              </button>
+              <button onClick={clearBet} disabled={phase !== "betting" || betStack.length === 0} title="Clear bet">
+                <Trash2 size={16} />
+              </button>
+            </div>
           </div>
         </section>
 
@@ -334,7 +413,7 @@ function App() {
           </div>
           <div>
             <span>Table limit</span>
-            <strong>$10 - $100</strong>
+            <strong>Any stack</strong>
           </div>
           <div>
             <span>Dealer rule</span>
@@ -395,7 +474,7 @@ function PlayingCard({ card, index }: { card: Card; index: number }) {
       <div className="card-face">
         {card.hidden ? (
           <div className="card-back">
-            <img src="/images/card-back.svg" alt="Hidden card" />
+            <img src={assetPath("images/card-back.svg")} alt="Hidden card" />
           </div>
         ) : (
           <>
@@ -403,7 +482,7 @@ function PlayingCard({ card, index }: { card: Card; index: number }) {
               <b>{card.rank}</b>
               <span>{suitGlyph[card.suit]}</span>
             </div>
-            <img className="suit-art" src={`/images/${card.suit}.svg`} alt={suitName[card.suit]} />
+            <img className="suit-art" src={assetPath(`images/${card.suit}.svg`)} alt={suitName[card.suit]} />
             <div className="corner bottom">
               <b>{card.rank}</b>
               <span>{suitGlyph[card.suit]}</span>

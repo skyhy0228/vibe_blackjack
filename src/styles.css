@@ -30,7 +30,7 @@ button {
   padding: clamp(16px, 3vw, 36px);
   background:
     linear-gradient(135deg, rgba(9, 11, 13, 0.66), rgba(17, 11, 7, 0.88)),
-    url("/images/casino-table.svg") center / cover fixed;
+    var(--table-image) center / cover fixed;
   overflow: hidden;
 }
 
@@ -67,7 +67,9 @@ button {
 .center-lane,
 .stats,
 .cards,
-.chip-tray {
+.chip-tray,
+.bet-stack-actions,
+.quick-bankrolls {
   display: flex;
   align-items: center;
 }
@@ -271,6 +273,82 @@ h1 {
   flex-wrap: wrap;
 }
 
+.bankroll-panel,
+.bet-stack {
+  display: grid;
+  gap: 8px;
+  min-width: min(100%, 190px);
+  padding: 12px;
+  border: 1px solid rgba(255, 232, 164, 0.24);
+  border-radius: 8px;
+  background: rgba(4, 20, 16, 0.68);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.bankroll-panel label,
+.bet-stack span {
+  color: #b8d3c1;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.bankroll-input-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.bankroll-input-row span {
+  color: #ffd66e;
+  font-weight: 950;
+}
+
+.bankroll-input-row input {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid rgba(255, 232, 164, 0.28);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.24);
+  color: #fff7d9;
+  font: inherit;
+  font-weight: 900;
+  padding: 0 9px;
+}
+
+.bankroll-input-row input:disabled {
+  opacity: 0.62;
+}
+
+.quick-bankrolls {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.quick-bankrolls button,
+.bet-stack-actions button {
+  min-height: 30px;
+  border: 1px solid rgba(255, 232, 164, 0.24);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  color: #fff7d9;
+  font-weight: 900;
+}
+
+.quick-bankrolls button {
+  flex: 1 1 72px;
+  padding: 0 8px;
+  font-size: 0.78rem;
+}
+
+.quick-bankrolls button:disabled,
+.bet-stack-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
 .shoe {
   display: grid;
   gap: 8px;
@@ -286,7 +364,7 @@ h1 {
   height: 104px;
   border-radius: 8px;
   background:
-    url("/images/card-back.svg") center / cover,
+    var(--card-back-image) center / cover,
     #2a0d19;
   box-shadow:
     5px 5px 0 rgba(255, 255, 255, 0.25),
@@ -324,6 +402,7 @@ h1 {
 }
 
 .chip {
+  position: relative;
   display: grid;
   place-items: center;
   width: clamp(54px, 8vw, 68px);
@@ -351,6 +430,46 @@ h1 {
 .chip:disabled {
   cursor: not-allowed;
   opacity: 0.4;
+}
+
+.chip-count {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 5px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-size: 0.68rem;
+  line-height: 1;
+}
+
+.bet-stack {
+  min-width: 150px;
+  justify-items: center;
+}
+
+.bet-stack strong {
+  color: #ffd66e;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.bet-stack-actions {
+  justify-content: center;
+  gap: 7px;
+}
+
+.bet-stack-actions button {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  padding: 0;
 }
 
 .chip-10 {
