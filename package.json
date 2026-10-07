@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
+    "deploy": "npm run build && gh-pages -d dist",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
@@ -17,6 +18,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "4.3.4",
+    "gh-pages": "^6.1.1",
     "typescript": "^5.9.3",
     "vite": "^6.4.4"
   }
