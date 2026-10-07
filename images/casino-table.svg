@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <defs>
+    <radialGradient id="felt" cx="50%" cy="46%" r="62%">
+      <stop offset="0" stop-color="#116d50"/>
+      <stop offset="0.52" stop-color="#063f33"/>
+      <stop offset="1" stop-color="#120905"/>
+    </radialGradient>
+    <filter id="noise">
+      <feTurbulence baseFrequency="0.9" numOctaves="4" seed="8" type="fractalNoise"/>
+      <feColorMatrix values="0 0 0 0 0.04 0 0 0 0 0.23 0 0 0 0 0.17 0 0 0 0.26 0"/>
+    </filter>
+    <linearGradient id="rail" x1="0" x2="1">
+      <stop stop-color="#5d2b12"/>
+      <stop offset="0.44" stop-color="#9a5a23"/>
+      <stop offset="1" stop-color="#3a170c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="#080807"/>
+  <ellipse cx="800" cy="520" rx="710" ry="410" fill="url(#rail)"/>
+  <ellipse cx="800" cy="500" rx="645" ry="350" fill="url(#felt)"/>
+  <ellipse cx="800" cy="500" rx="595" ry="302" fill="none" stroke="#e8c36e" stroke-width="4" stroke-dasharray="24 18" opacity="0.38"/>
+  <path d="M306 642c140 96 834 96 988 0" fill="none" stroke="#ffe6a1" stroke-width="6" opacity="0.25"/>
+  <text x="800" y="524" text-anchor="middle" fill="#f6db8b" font-family="Arial, sans-serif" font-size="74" font-weight="800" opacity="0.18">BLACKJACK</text>
+  <rect width="1600" height="1000" filter="url(#noise)" opacity="0.6"/>
+</svg>
