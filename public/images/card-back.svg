@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 320">
+  <defs>
+    <linearGradient id="back" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#371025"/>
+      <stop offset="0.52" stop-color="#85233e"/>
+      <stop offset="1" stop-color="#180812"/>
+    </linearGradient>
+    <pattern id="diamonds" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="28" height="28" fill="none"/>
+      <rect x="9" y="9" width="10" height="10" fill="#ffd76a" opacity="0.55"/>
+    </pattern>
+  </defs>
+  <rect x="5" y="5" width="210" height="310" rx="18" fill="#fff6df"/>
+  <rect x="16" y="16" width="188" height="288" rx="12" fill="url(#back)"/>
+  <rect x="26" y="26" width="168" height="268" rx="8" fill="url(#diamonds)" opacity="0.82"/>
+  <rect x="39" y="39" width="142" height="242" rx="8" fill="none" stroke="#ffd76a" stroke-width="5"/>
+  <circle cx="110" cy="160" r="45" fill="#120713" stroke="#ffd76a" stroke-width="5"/>
+  <text x="110" y="174" text-anchor="middle" font-family="Georgia, serif" font-size="38" font-weight="900" fill="#ffd76a">VB</text>
+</svg>
