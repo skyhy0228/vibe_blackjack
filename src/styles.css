@@ -146,6 +146,23 @@ h1 {
   align-items: center;
 }
 
+.player-hands {
+  display: grid;
+  gap: 16px;
+}
+
+.player-hands .hand-zone {
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+
+.player-hands .active-hand {
+  border-color: rgba(255, 214, 110, 0.55);
+  background: rgba(255, 214, 110, 0.08);
+  box-shadow: 0 0 28px rgba(255, 214, 110, 0.14);
+}
+
 .hand-meta {
   display: grid;
   place-items: center;
@@ -166,6 +183,19 @@ h1 {
 .hand-meta strong {
   color: #ffd66e;
   font-size: clamp(1.6rem, 3vw, 2.55rem);
+}
+
+.hand-meta em,
+.hand-meta small {
+  display: block;
+  color: #fff7d9;
+  font-style: normal;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.hand-meta small {
+  color: #b8d3c1;
 }
 
 .cards {
